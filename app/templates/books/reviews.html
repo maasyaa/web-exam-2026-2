@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% from 'includes/pagination.html' import render_pagination %}
+
+{% block content %}
+<div class="container">
+    <div class="my-4">
+        <a href="{{ url_for('books.show', book_id=book.id) }}" class="btn btn-outline-secondary mb-3">← Назад к книге</a>
+        <h2>Отзывы о книге «{{ book.name }}»</h2>
+
+        <div class="row mb-4">
+            <div class="col-md-6 mx-auto">
+                <form method="GET" class="row g-2">
+                    <div class="col-auto"><label for="sort" class="col-form-label">Сортировать:</label></div>
+                    <div class="col"><select name="sort" id="sort" class="form-select">
+                        <option value="newest" {% if sort_by=='newest' %}selected{% endif %}>Сначала новые</option>
+                        <option value="positive_first" {% if sort_by=='positive_first' %}selected{% endif %}>Сначала положительные</option>
+                        <option value="negative_first" {% if sort_by=='negative_first' %}selected{% endif %}>Сначала отрицательные</option>
+                    </select></div>
+                    <div class="col-auto"><button type="submit" class="btn btn-dark">Применить</button></div>
+                </form>
+            </div>
+        </div>
+
+        {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ review.user.full_name }}</strong>
+                    <span>{{ review.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+                <div class="rating">{% for i in range(review.rating) %}★{% endfor %}{% for i in range(5-review.rating) %}☆{% endfor %} ({{ review.rating }})</div>
+                <p>{{ review.text }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        {{ render_pagination(pagination, 'books.reviews', {'book_id': book.id, 'sort': sort_by}) }}
+
+        {% if current_user.is_authenticated and not user_review %}
+        <div class="card mt-4">
+            <div class="card-header bg-dark text-white">Оставить отзыв</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('books.create_review', book_id=book.id) }}">
+                    <div class="mb-3"><select name="rating" class="form-select" required>
+                        <option value="5">5 — отлично</option><option value="4">4 — хорошо</option>
+                        <option value="3">3 — удовлетворительно</option><option value="2">2 — неудовлетворительно</option>
+                        <option value="1">1 — плохо</option><option value="0">0 — ужасно</option>
+                    </select></div>
+                    <div class="mb-3"><textarea name="text" class="form-control" rows="4" required></textarea></div>
+                    <button type="submit" class="btn btn-dark">Отправить</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% from 'includes/pagination.html' import render_pagination %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Журнал действий пользователей</h4>
+    <a href="{{ url_for('statistics.export_user_actions') }}" class="btn btn-success">Экспорт в CSV</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>ФИО пользователя</th>
+                <th>Название книги</th>
+                <th>Дата и время просмотра</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for action in pagination.items %}
+            <tr>
+                <td>{{ loop.index + (pagination.page - 1) * pagination.per_page }}</td>
+                <td>{{ action.user_fullname }}</td>
+                <td>{{ action.book_name }}</td>
+                <td>{{ action.viewed_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">Нет записей</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{{ render_pagination(pagination, 'statistics.user_actions') }}

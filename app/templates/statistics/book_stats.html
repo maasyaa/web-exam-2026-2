@@ -1,0 +1,50 @@
+{% from 'includes/pagination.html' import render_pagination %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Статистика просмотров книг</h4>
+    <a href="{{ url_for('statistics.export_book_stats', date_from=date_from, date_to=date_to) }}" class="btn btn-success">Экспорт в CSV</a>
+</div>
+
+<form method="GET" class="row g-3 mb-4 align-items-end">
+    <div class="col-md-4">
+        <label for="date_from" class="form-label">Дата от</label>
+        <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+    </div>
+    <div class="col-md-4">
+        <label for="date_to" class="form-label">Дата до</label>
+        <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-dark w-100">Применить</button>
+    </div>
+    <div class="col-md-2">
+        <a href="{{ url_for('statistics.book_stats') }}" class="btn btn-outline-secondary w-100">Сбросить</a>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Название книги</th>
+                <th>Количество просмотров</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in pagination.items %}
+            <tr>
+                <td>{{ loop.index + (pagination.page - 1) * pagination.per_page }}</td>
+                <td>{{ stat.name }}</td>
+                <td>{{ stat.view_count }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="text-center">Нет данных</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{{ render_pagination(pagination, 'statistics.book_stats', {'date_from': date_from, 'date_to': date_to}) }}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% from 'includes/pagination.html' import render_pagination %}
+
+{% block content %}
+<div class="container">
+    <div class="my-5">
+        <h2 class="mb-3 text-center">Каталог книг</h2>
+
+        <form class="mb-5 mt-3 row align-items-center">
+            <div class="col-md-6 my-3">
+                <input autocomplete="off" type="text" class="form-control" name="name" value="{{ request.args.get('name') or '' }}" placeholder="Название книги">
+            </div>
+            <div class="col-md-4 my-3">
+                <select class="form-select" name="genre_ids" multiple title="Жанр">
+                    <option value="">Все жанры</option>
+                    {% for genre in genres %}
+                        <option value="{{ genre.id }}" {% if genre.id|string in request.args.getlist('genre_ids') %}selected{% endif %}>{{ genre.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 my-3 align-self-end">
+                <button type="submit" class="btn btn-dark w-100">Найти</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Популярные книги (вариант 4) -->
+    {% if popular_books %}
+    <div class="my-5">
+        <h3>Популярные книги</h3>
+        <div class="row">
+            {% for book in popular_books %}
+            <div class="col-md-3 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.name }}</h5>
+                        <p class="card-text">{{ book.short_desc|truncate(100) }}</p>
+                        <a href="{{ url_for('books.show', book_id=book.id) }}" class="btn btn-sm btn-dark">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Недавно просмотренные (вариант 4) -->
+    {% if recent_books %}
+    <div class="my-5">
+        <h3>Недавно просмотренные книги</h3>
+        <div class="row">
+            {% for book in recent_books %}
+            <div class="col-md-3 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.name }}</h5>
+                        <p class="card-text">{{ book.short_desc|truncate(100) }}</p>
+                        <a href="{{ url_for('books.show', book_id=book.id) }}" class="btn btn-sm btn-dark">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="books-list container-fluid mt-3 mb-3">
+        {% for book in books %}
+            <div class="row p-3 border rounded mb-3" data-url="{{ url_for('books.show', book_id=book.id) }}">
+                <div class="col-md-3 mb-3 mb-md-0 d-flex align-items-center justify-content-center">
+                    {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" class="img-fluid" style="max-height: 150px;" alt="обложка">
+                    {% else %}
+                        <div class="bg-secondary text-white p-3">Нет обложки</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-9 align-items-center">
+                    <div class="d-flex">
+                        <h4 class="text-uppercase">{{ book.name }}</h4>
+                        <p class="ms-auto rating">
+                            <span>★</span> <span>{{ "%.2f"|format(book.rating) }}</span>
+                        </p>
+                    </div>
+                    <p class="text-muted my-3">{{ book.author_name }}</p>
+                    <p><strong>Год:</strong> {{ book.year or '—' }} | <strong>Издательство:</strong> {{ book.publisher or '—' }} | <strong>Страниц:</strong> {{ book.pages or '—' }}</p>
+                    <p>{{ book.short_desc | truncate(200) }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-5">
+        {{ render_pagination(pagination, request.endpoint, request.args) }}
+    </div>
+
+    {% if current_user.is_authenticated and current_user.is_admin() %}
+        <div class="text-center my-3">
+            <a class="btn btn-lg btn-dark" href="{{ url_for('books.new') }}">Добавить книгу</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

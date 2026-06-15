@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Статистика</h2>
+
+    <ul class="nav nav-tabs" id="statsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="user-actions-tab" data-bs-toggle="tab" data-bs-target="#user-actions" type="button" role="tab">Журнал действий пользователей</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="book-stats-tab" data-bs-toggle="tab" data-bs-target="#book-stats" type="button" role="tab">Статистика просмотров книг</button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <div class="tab-pane fade show active" id="user-actions" role="tabpanel">
+            <div id="user-actions-content">Загрузка...</div>
+        </div>
+        <div class="tab-pane fade" id="book-stats" role="tabpanel">
+            <div id="book-stats-content">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadTab(tabId, url, containerId) {
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById(containerId).innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById(containerId).innerHTML = '<div class="alert alert-danger">Ошибка загрузки данных</div>';
+                console.error(error);
+            });
+    }
+
+    // Загружаем активную вкладку
+    loadTab('user-actions', '/statistics/user-actions', 'user-actions-content');
+
+    // При переключении вкладок подгружаем нужное содержимое
+    document.querySelectorAll('#statsTab button').forEach(btn => {
+        btn.addEventListener('shown.bs.tab', function (e) {
+            const targetId = e.target.getAttribute('data-bs-target');
+            if (targetId === '#user-actions') {
+                loadTab('user-actions', '/statistics/user-actions', 'user-actions-content');
+            } else if (targetId === '#book-stats') {
+                loadTab('book-stats', '/statistics/book-stats', 'book-stats-content');
+            }
+        });
+    });
+</script>
+{% endblock %}

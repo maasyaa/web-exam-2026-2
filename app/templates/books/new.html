@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-3 text-center text-uppercase font-weight-bold">Добавление книги</h2>
+
+    <form method="POST" action="{{ url_for('books.create') }}" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="name">Название книги *</label>
+                    <input class="form-control" type="text" name="name" id="name" value="{{ book.name or '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="author_name">Автор *</label>
+                    <input class="form-control" type="text" name="author_name" id="author_name" value="{{ book.author_name or '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="year">Год издания</label>
+                    <input class="form-control" type="number" name="year" id="year" value="{{ book.year or '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="publisher">Издательство</label>
+                    <input class="form-control" type="text" name="publisher" id="publisher" value="{{ book.publisher or '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="pages">Количество страниц</label>
+                    <input class="form-control" type="number" name="pages" id="pages" value="{{ book.pages or '' }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="cover_image">Обложка</label>
+                    <input class="form-control" type="file" name="cover_image" id="cover_image" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <label for="genre_ids">Жанры (можно выбрать несколько)</label>
+                    <select class="form-select" name="genre_ids" id="genre_ids" multiple size="5">
+                        {% for genre in genres %}
+                            <option value="{{ genre.id }}">{{ genre.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="short_desc">Краткое описание *</label>
+            <textarea class="form-control" name="short_desc" id="short_desc" rows="3" required>{{ book.short_desc or '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="full_desc">Полное описание (Markdown) *</label>
+            <textarea class="form-control" name="full_desc" id="full_desc" rows="10" required>{{ book.full_desc or '' }}</textarea>
+        </div>
+        <div class="mb-3 text-center">
+            <input type="submit" class="btn btn-dark" value="Сохранить книгу">
+        </div>
+    </form>
+</div>
+{% endblock %}
